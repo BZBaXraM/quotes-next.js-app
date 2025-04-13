@@ -1,18 +1,24 @@
 "use client";
 import { Quote } from "@/models/quote";
 import { useEffect, useState } from "react";
+import Button from "./components/Button";
+import Quotes from "./components/Quotes";
+
+const RANDOM_QUOTES_URL = "http://localhost:3000/quotes/random?limit=10";
 
 export default function Home() {
 	const [quotes, setQuotes] = useState<Quote[]>([]);
 
-	useEffect(() => {
-		const fetchQuotes = async () => {
-			const response = await fetch(
-				"http://localhost:3000/quotes/random?limit=10"
-			);
-
+	const fetchQuotes = async () => {
+		try {
+			const response = await fetch(RANDOM_QUOTES_URL);
 			setQuotes(await response.json());
-		};
+		} catch (error) {
+			console.log(`Error fetching quotes: ${error}`);
+		}
+	};
+
+	useEffect(() => {
 		fetchQuotes();
 	}, []);
 
@@ -21,46 +27,10 @@ export default function Home() {
 			<h1 className="text-center text-3xl mb-6 dark:text-white">
 				Quotes
 			</h1>
-			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-				{quotes.map((quote) => (
-					<div
-						key={quote.id}
-						className="bg-white 
-						dark:bg-gray-800
-						p-4 shadow-md rounded-lg"
-					>
-						<p
-							className="mb-4 text-xl italic
-							text-gray-900
-						dark:text-gray-100
-						"
-						>
-							{quote.text}
-						</p>
-						<p
-							className="mb-10 text-right text-xl font-semibold
-						text-gray-700
-						dark:text-gray-300"
-						>
-							- {quote.author}
-						</p>
-						<div className="flex flex-wrap mt-2">
-							{quote.categories.map((category) => (
-								<span
-									key={category}
-									className="text-lg bg-gray-200
-									dark:bg-gray-700
-									text-gray-700 
-									dark:text-gray-300
-									px-2 py-1 rounded-full mr-2 mb-2"
-								>
-									{category}
-								</span>
-							))}
-						</div>
-					</div>
-				))}
+			<div className="text-center mb-6">
+				<Button onClick={fetchQuotes} text={"Get Random Quotes"} />
 			</div>
+			<Quotes quotes={quotes} />
 		</div>
 	);
 }
