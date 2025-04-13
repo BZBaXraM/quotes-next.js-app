@@ -24,6 +24,9 @@ export default function Home() {
 
 	return (
 		<div className="p-4">
+			<h1 className="text-3xl mb-6 text-center dark:text-white">
+				Random Quotes
+			</h1>
 			<div className="text-center mb-6">
 				<Button onClick={fetchQuotes} text={"Get Random Quotes"} />
 			</div>

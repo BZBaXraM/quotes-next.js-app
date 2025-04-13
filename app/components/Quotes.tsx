@@ -10,7 +10,7 @@ const Quotes = ({ quotes }: QuotesProps) => {
 			{quotes.map((quote) => (
 				<div
 					key={quote.id}
-					className="bg-white 
+					className="bg-gray-100
 						dark:bg-gray-800
 						p-4 shadow-md rounded-lg"
 				>
