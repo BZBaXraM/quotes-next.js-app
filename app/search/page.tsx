@@ -30,9 +30,17 @@ const Search = () => {
 	const [category, setCategory] = useState<string>("");
 	const [quotes, setQuotes] = useState<Quote[]>([]);
 	const [searchSubmitted, setSearchSubmitted] = useState<boolean>(false);
+	const [searchButtonClicked, setSearchButtonClicked] =
+		useState<boolean>(false);
 	const [errors, setErrors] = useState<ValidationErrors>({});
 
 	const handleSearch = async () => {
+		setSearchButtonClicked(true);
+
+		if (Object.keys(errors).length > 0) {
+			return;
+		}
+
 		try {
 			setSearchSubmitted(true);
 			const query = createSearchQuery(text, author, category);
@@ -53,8 +61,8 @@ const Search = () => {
 	};
 
 	const getValidationMessage = (setter: string, value: string) => {
-		if (setter === "text" && value && value.length < 2) {
-			return "Text must be at least 2 characters long.";
+		if (setter === "text" && value && value.length < 3) {
+			return "Text must be at least 3 characters long.";
 		}
 		if (setter === "author" && value && value.length < 2) {
 			return "Author must be at least 2 characters long.";
@@ -111,7 +119,7 @@ const Search = () => {
 						}
 						className="p-2 w-full border border-gray-300 rounded dark:bg-gray-800 dark:border-gray-600 dark:text-white"
 					/>
-					{errors.text && (
+					{searchButtonClicked && errors.text && (
 						<p className="text-red-500 text-base">{errors.text}</p>
 					)}
 				</div>
@@ -125,7 +133,7 @@ const Search = () => {
 						}
 						className="p-2 w-full border border-gray-300 rounded dark:bg-gray-800 dark:border-gray-600 dark:text-white"
 					/>
-					{errors.author && (
+					{searchButtonClicked && errors.author && (
 						<p className="text-red-500 text-base">
 							{errors.author}
 						</p>
@@ -141,7 +149,7 @@ const Search = () => {
 						}
 						className="p-2 w-full border border-gray-300 rounded dark:bg-gray-800 dark:border-gray-600 dark:text-white"
 					/>
-					{errors.category && (
+					{searchButtonClicked && errors.category && (
 						<p className="text-red-500 text-base">
 							{errors.category}
 						</p>
@@ -150,7 +158,7 @@ const Search = () => {
 			</div>
 			<div className="text-center mb-6 flex justify-center gap-4">
 				<Button onClick={handleSearch} text="Search" />
-				<Button onClick={clearInputs} text="Clear inputs" />
+				<Button onClick={clearInputs} text="Clear" />
 			</div>
 
 			{quotes.length > 0 ? (
