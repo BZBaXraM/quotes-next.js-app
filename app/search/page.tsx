@@ -1,6 +1,8 @@
 "use client";
 import { Quote } from "@/models/quote";
 import { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/ReactToastify.css";
 import Button from "../components/Button";
 import Quotes from "../components/Quotes";
 
@@ -22,6 +24,7 @@ interface ValidationErrors {
 	text?: string;
 	author?: string;
 	category?: string;
+	limit?: string;
 }
 
 const Search = () => {
@@ -33,6 +36,7 @@ const Search = () => {
 	const [searchButtonClicked, setSearchButtonClicked] =
 		useState<boolean>(false);
 	const [errors, setErrors] = useState<ValidationErrors>({});
+	const [limit, setLimit] = useState<string>("10");
 
 	const handleSearch = async () => {
 		setSearchButtonClicked(true);
@@ -47,10 +51,34 @@ const Search = () => {
 			const response = await fetch(
 				`http://localhost:3000/quotes?${query}`
 			);
+
+			if (!response.ok) {
+				const errorData = await response.json();
+				if (!errorData.errors) {
+					toast.error("Unexpected error occurred.");
+					return;
+				}
+				const fieldErrors = errorData.errors
+					.filter((err: { type: string }) => err.type === "field")
+					.map(
+						(err: { msg: string; path: string; value: string }) =>
+							`${err.msg} (${err.path} ${err.value})`
+					);
+
+				fieldErrors.forEach((err: string) => {
+					toast.error(err);
+				});
+
+				return;
+			}
+
 			const data = await response.json();
 			setQuotes(data);
 		} catch (error) {
 			console.log(`Error fetching quotes: ${error}`);
+			if (error instanceof Error) {
+				toast.error(error.message);
+			}
 		}
 	};
 
@@ -58,6 +86,9 @@ const Search = () => {
 		setText("");
 		setAuthor("");
 		setCategory("");
+		setSearchButtonClicked(false);
+		setSearchSubmitted(false);
+		setQuotes([]);
 	};
 
 	const getValidationMessage = (setter: string, value: string) => {
@@ -87,6 +118,8 @@ const Search = () => {
 			case "category":
 				setCategory(value);
 				break;
+			case "limit":
+				setLimit(value);
 		}
 
 		const validationMessage = getValidationMessage(setter, value);
@@ -105,10 +138,15 @@ const Search = () => {
 
 	return (
 		<div className="p-4">
+			<ToastContainer
+				position="top-right"
+				autoClose={5000}
+				hideProgressBar={false}
+			/>
 			<h1 className="text-3xl mb-6 text-center dark:text-white">
 				Search Quotes
 			</h1>
-			<div className="text-xl grid grid-cols-1  md:grid-cols-3 gap-4 mb-6">
+			<div className="text-xl grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_0.5fr] gap-4 mb-6">
 				<div className="w-full">
 					<input
 						type="text"
@@ -154,6 +192,17 @@ const Search = () => {
 							{errors.category}
 						</p>
 					)}
+				</div>
+				<div className="w-full">
+					<input
+						type="text"
+						placeholder="Limit"
+						value={limit}
+						onChange={(e) =>
+							handleInputChange("limit", e.target.value)
+						}
+						className="p-2 w-full border border-gray-300 rounded dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+					/>
 				</div>
 			</div>
 			<div className="text-center mb-6 flex justify-center gap-4">
