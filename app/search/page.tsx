@@ -1,21 +1,24 @@
 "use client";
 import { Quote } from "@/models/quote";
 import { useState } from "react";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/ReactToastify.css";
+import { toast } from "react-toastify";
 import Button from "../components/Button";
 import Quotes from "../components/Quotes";
 
 const CATEGORY_NAME_REGEX = /^[a-z0-9\-]+$/;
 
-const createSearchQuery = (text: string, author: string, category: string) => {
+const createSearchQuery = (
+	text: string,
+	author: string,
+	category: string,
+	limit: string = "10"
+) => {
 	const params = new URLSearchParams();
 
 	if (text) params.append("text", text);
 	if (author) params.append("author", author);
 	if (category) params.append("category", category);
-
-	params.append("limit", "10");
+	if (limit) params.append("limit", limit);
 
 	return params.toString();
 };
@@ -36,7 +39,7 @@ const Search = () => {
 	const [searchButtonClicked, setSearchButtonClicked] =
 		useState<boolean>(false);
 	const [errors, setErrors] = useState<ValidationErrors>({});
-	const [limit, setLimit] = useState<string>("10");
+	const [limit, setLimit] = useState<string>("");
 
 	const handleSearch = async () => {
 		setSearchButtonClicked(true);
@@ -47,7 +50,7 @@ const Search = () => {
 
 		try {
 			setSearchSubmitted(true);
-			const query = createSearchQuery(text, author, category);
+			const query = createSearchQuery(text, author, category, limit);
 			const response = await fetch(
 				`http://localhost:3000/quotes?${query}`
 			);
@@ -86,6 +89,7 @@ const Search = () => {
 		setText("");
 		setAuthor("");
 		setCategory("");
+		setLimit("");
 		setSearchButtonClicked(false);
 		setSearchSubmitted(false);
 		setQuotes([]);
@@ -138,11 +142,6 @@ const Search = () => {
 
 	return (
 		<div className="p-4">
-			<ToastContainer
-				position="top-right"
-				autoClose={5000}
-				hideProgressBar={false}
-			/>
 			<h1 className="text-3xl mb-6 text-center dark:text-white">
 				Search Quotes
 			</h1>

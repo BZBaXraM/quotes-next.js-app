@@ -3,6 +3,7 @@ import { Quote } from "@/models/quote";
 import { useEffect, useState } from "react";
 import Button from "./components/Button";
 import Quotes from "./components/Quotes";
+import { toast } from "react-toastify";
 
 const RANDOM_QUOTES_URL = "http://localhost:3000/quotes/random?limit=10";
 
@@ -14,6 +15,11 @@ export default function Home() {
 			const response = await fetch(RANDOM_QUOTES_URL);
 			setQuotes(await response.json());
 		} catch (error) {
+			toast.error(
+				error instanceof Error
+					? error.message
+					: "An unknown error occurred"
+			);
 			console.log(`Error fetching quotes: ${error}`);
 		}
 	};
