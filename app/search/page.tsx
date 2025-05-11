@@ -4,6 +4,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import Button from "../components/Button";
 import Quotes from "../components/Quotes";
+import InputField from "../components/InputField";
 
 const CATEGORY_NAME_REGEX = /^[a-z0-9\-]+$/;
 
@@ -140,69 +141,51 @@ const Search = () => {
 		});
 	};
 
+	const inputFields = [
+		{
+			placeholder: "Search by text",
+			value: text,
+			setter: "text",
+			errors: errors.text,
+		},
+		{
+			placeholder: "Search by author",
+			value: author,
+			setter: "author",
+			errors: errors.author,
+		},
+		{
+			placeholder: "Search by category",
+			value: category,
+			setter: "category",
+			errors: errors.category,
+		},
+		{
+			placeholder: "Limit",
+			value: limit || "",
+			setter: "limit",
+			errors: null,
+		},
+	];
+
 	return (
 		<div className="p-4">
 			<h1 className="text-3xl mb-6 text-center dark:text-white">
 				Search Quotes
 			</h1>
 			<div className="text-xl grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_0.5fr] gap-4 mb-6">
-				<div className="w-full">
-					<input
-						type="text"
-						placeholder="Search by text"
-						value={text}
-						onChange={(e) =>
-							handleInputChange("text", e.target.value)
+				{inputFields.map((field) => (
+					<InputField
+						key={field.setter}
+						placeholder={field.placeholder}
+						value={field.value}
+						onChange={(value) =>
+							handleInputChange(field.setter, value)
 						}
-						className="p-2 w-full border border-gray-300 rounded dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+						error={field.errors}
+						showError={searchButtonClicked}
 					/>
-					{searchButtonClicked && errors.text && (
-						<p className="text-red-500 text-base">{errors.text}</p>
-					)}
-				</div>
-				<div className="w-full">
-					<input
-						type="text"
-						placeholder="Search by author"
-						value={author}
-						onChange={(e) =>
-							handleInputChange("author", e.target.value)
-						}
-						className="p-2 w-full border border-gray-300 rounded dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-					/>
-					{searchButtonClicked && errors.author && (
-						<p className="text-red-500 text-base">
-							{errors.author}
-						</p>
-					)}
-				</div>
-				<div className="w-full">
-					<input
-						type="text"
-						placeholder="Search by category"
-						value={category}
-						onChange={(e) =>
-							handleInputChange("category", e.target.value)
-						}
-						className="p-2 w-full border border-gray-300 rounded dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-					/>
-					{searchButtonClicked && errors.category && (
-						<p className="text-red-500 text-base">
-							{errors.category}
-						</p>
-					)}
-				</div>
-				<div className="w-full">
-					<input
-						type="text"
-						placeholder="Limit"
-						value={limit}
-						onChange={(e) =>
-							handleInputChange("limit", e.target.value)
-						}
-						className="p-2 w-full border border-gray-300 rounded dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-					/>
-				</div>
+				))}
 			</div>
 			<div className="text-center mb-6 flex justify-center gap-4">
 				<Button onClick={handleSearch} text="Search" />
