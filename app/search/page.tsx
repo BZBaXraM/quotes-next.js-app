@@ -189,7 +189,11 @@ const Search = () => {
 			</div>
 			<div className="text-center mb-6 flex justify-center gap-4">
 				<Button onClick={handleSearch} text="Search" />
-				<Button onClick={clearInputs} text="Clear" />
+				<Button
+					onClick={clearInputs}
+					text="Clear"
+					variant="secondary"
+				/>
 			</div>
 
 			{quotes.length > 0 ? (
