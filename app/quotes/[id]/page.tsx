@@ -16,31 +16,40 @@ const QuotePage = (props: QuotePageProps) => {
 	const { id } = params;
 	const [isLoading, setLoading] = useState<boolean>(true);
 
+	const isValidId = (id: string) => {
+		const parseId = parseInt(id, 10);
+		return Number.isInteger(parseId) && parseId > 0;
+	};
+
 	const fetchQuote = async () => {
-		if (id) {
-			try {
-				const response = await fetch(
-					`http://localhost:3000/quotes/${id}`
-				);
-				const data = await response.json();
-				if (response.status === 404) {
-					toast.error(data.message);
-					return;
-				}
-				if (response.ok) {
-					setQuote(data);
-				}
-			} catch (error) {
-				if (error instanceof Error) {
-					toast.error(error.message);
-					console.error("Error fetching quotes: ", error);
-				} else {
-					toast.error("An unknown error occurred.");
-					console.error("Error fetching quotes: ", error);
-				}
-			} finally {
-				setLoading(false);
+		if (!isValidId(id)) {
+			toast.error(
+				`Invalid quote ID ${id}. ID must be an integer greater than 0.`
+			);
+			setLoading(false);
+			return;
+		}
+
+		try {
+			const response = await fetch(`http://localhost:3000/quotes/${id}`);
+			const data = await response.json();
+			if (response.status === 404) {
+				toast.error(data.message);
+				return;
 			}
+			if (response.ok) {
+				setQuote(data);
+			}
+		} catch (error) {
+			if (error instanceof Error) {
+				toast.error(error.message);
+				console.error("Error fetching quotes: ", error);
+			} else {
+				toast.error("An unknown error occurred.");
+				console.error("Error fetching quotes: ", error);
+			}
+		} finally {
+			setLoading(false);
 		}
 	};
 
@@ -64,9 +73,9 @@ const QuotePage = (props: QuotePageProps) => {
 
 	return (
 		<div>
-			<div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg dark:bg-gray-800">
+			<div className="max-w-4xl mx-auto p-6 mt-7 bg-white shadow-lg rounded-lg dark:bg-gray-800">
 				<h2
-					className="text-4xl font-bold 
+					className="text-xl sm:text-2xl font-bold 
 				text-center mb-6 text-violet-900 dark:text-violet-300"
 				>
 					{quote.text}
